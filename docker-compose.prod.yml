@@ -1,0 +1,99 @@
+version: '3.3'
+
+services:
+    rmq:
+        build: ./rmq
+        env_file: 
+            - .env
+        environment: 
+            - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST}
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+        volumes:
+            - log_data:/var/log/rmq/
+        restart: on-failure:3
+            
+    postgres_db:
+        image: postgres:alpine
+        environment: 
+            - POSTGRES_DB=${SQL_DB_NAME}
+            - POSTGRES_USER=${SQL_DB_USER}
+            - POSTGRES_PASSWORD=${SQL_DB_PASSWORD}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+            - log_data:/var/log/postgresql
+        restart: on-failure:3
+    api:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.prod
+        command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+        environment: 
+            - DJANGO_SETTINGS_MODULE=config.settings_prod
+        env_file:
+            - .env
+        depends_on: 
+            - rmq
+            - postgres_db
+        volumes: 
+            - log_data:/var/log/api
+            - static_volume:/home/app/web/staticfiles
+    nginx:
+        build: ./nginx
+        ports:
+            - 80:80
+        # volumes:
+        #     - static_volume:/home/app/web/staticfiles
+        depends_on:
+            - api
+        restart: on-failure:3
+    celery:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.prod
+        command: celery -A config worker -l warning -f /var/log/celery/celery.log
+        env_file: 
+            - .env
+        restart: on-failure:3
+        depends_on: 
+            - api
+            - rmq
+        volumes: 
+            - log_data:/var/log/celery
+    celery-beat:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.prod
+        command: celery -A config beat -l info
+        env_file:
+            - .env
+        volumes: 
+            - log_data:/var/log/celery
+        # volumes:
+        #     - static_volume:/home/app/web/staticfiles
+        depends_on:
+            - postgres_db
+            - rmq
+        restart: on-failure:3
+
+    # pgbouncer:
+    #     image: pgbouncer/pgbouncer
+    #     restart: on-failure:3
+    #     environment: 
+    #         - DATABASES_HOST=postgres_db
+    #         - DATABASES_DBNAME=${SQL_DB_NAME}
+    #         - DATABASES_USER=${SQL_DB_USER}
+    #         - DATABASES_PASSWORD=${SQL_DB_PASSWORD}
+    #         - PGBOUNCER_AUTH_FILE=/etc/pgbouncer/userlist/userlist.txt
+    #         - PGBOUNCER_ADMIN_USERS=${SQL_DB_USER}
+    #         - PGBOUNCER_POOL_MODE=transaction
+    #         - PGBOUNCER_AUTH_TYPE=md5
+    #     volumes:
+    #         - ./pgbouncer:/etc/pgbouncer/userlist:ro
+    #     depends_on: 
+    #         - postgres_db
+
+volumes: 
+    postgres_data:
+    log_data:
+    static_volume:

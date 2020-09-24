@@ -1,0 +1,10 @@
+SQL_DB_NAME=tochka_db
+SQL_DB_USER=tochka_user
+SQL_DB_PASSWORD=tochka_password
+SQL_DB_HOST=postgres_db
+SQL_DB_PORT=5432
+DJANGO_LOG_PATH=/var/log/api
+RABBITMQ_DEFAULT_VHOST=tochka
+RABBITMQ_DEFAULT_USER=rmq_user
+RABBITMQ_DEFAULT_PASS=rmq_password
+DATABASE=postgres
