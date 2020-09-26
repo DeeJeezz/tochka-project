@@ -14,7 +14,6 @@ services:
             - POSTGRES_PASSWORD=${SQL_DB_PASSWORD}
         volumes:
             - postgres_data:/var/lib/postgresql/data/
-        restart: on-failure:3
 
     api:
         build: ./api
@@ -29,51 +28,17 @@ services:
         build: ./nginx
         ports:
             - 80:80
-        # volumes:
-        #     - static_volume:/home/app/web/staticfiles
         depends_on:
             - api
-        restart: on-failure:3
+
     celery:
         build: ./api
         command: celery -A config worker -l info
         env_file: 
             - .env
-        restart: on-failure:3
         depends_on: 
             - api
             - rmq
-        volumes: 
-            - log_data:/var/log/celery
-    # celery-beat:
-    #     build:
-    #         context: ./
-    #     command: celery -A config beat -l info
-    #     env_file:
-    #         - .env
-    #     # volumes:
-    #     #     - static_volume:/home/app/web/staticfiles
-    #     depends_on:
-    #         - postgres_db
-    #         - rmq
-    #     restart: on-failure:3
-
-    # pgbouncer:
-    #     image: pgbouncer/pgbouncer
-    #     restart: on-failure:3
-    #     environment: 
-    #         - DATABASES_HOST=postgres_db
-    #         - DATABASES_DBNAME=${SQL_DB_NAME}
-    #         - DATABASES_USER=${SQL_DB_USER}
-    #         - DATABASES_PASSWORD=${SQL_DB_PASSWORD}
-    #         - PGBOUNCER_AUTH_FILE=/etc/pgbouncer/userlist/userlist.txt
-    #         - PGBOUNCER_ADMIN_USERS=${SQL_DB_USER}
-    #         - PGBOUNCER_POOL_MODE=transaction
-    #         - PGBOUNCER_AUTH_TYPE=md5
-    #     volumes:
-    #         - ./pgbouncer:/etc/pgbouncer/userlist:ro
-    #     depends_on: 
-    #         - postgres_db
 
 volumes: 
     postgres_data:
