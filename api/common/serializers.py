@@ -1,6 +1,6 @@
 from common.models import Account
 from rest_framework import serializers
-from .service import add_balance_to_account, subtract_from_account_balance
+from common.service import add_balance_to_account, subtract_from_account_balance
 
 
 class AccountListSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class AccountAddBalanceSerializer(serializers.ModelSerializer):
 class AccountSubtractBalanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ('balance', )
+        fields = ('hold', )
         
     def update(self, instance, validated_data):
-        return subtract_from_account_balance(instance, validated_data.get('balance'))
+        return subtract_from_account_balance(instance, validated_data.get('hold', 0))

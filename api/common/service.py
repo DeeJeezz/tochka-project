@@ -1,4 +1,6 @@
-from common.exceptions import AccountNotActiveException, SubtractIsNotPossible
+from common.exceptions import SubtractIsNotPossible
+from tasks.tasks import task_subtract_hold_from_balance
+from datetime import datetime, timedelta
 
 
 def add_balance_to_account(account, add):
@@ -9,8 +11,7 @@ def add_balance_to_account(account, add):
     :param add: Сумма добавления.
     :return: Объект счета или исключение (если счет неактивен).
     """
-    if not account.status:
-        raise AccountNotActiveException()
+
     account.balance += add
     account.save()
     return account
@@ -31,6 +32,13 @@ def check_if_possible_to_subtract_balance(account, subtraction):
     return True
 
 
+def add_hold(account, hold):
+    if check_if_possible_to_subtract_balance(account, hold):
+        account.hold += hold
+        account.save()
+        return account
+
+
 def subtract_from_account_balance(account, subtraction):
     """
     Вычитание из баланса значения balance.
@@ -40,6 +48,6 @@ def subtract_from_account_balance(account, subtraction):
     :return: Объект счета или исключение (если баланс после вычета на счете будет меньше нуля).
     """
 
-    account.balance -= subtraction
-    account.save()
+    account = add_hold(account, subtraction)
+    task_subtract_hold_from_balance.apply_async(args=(account.uuid,), eta=datetime.utcnow() + timedelta(minutes=10))
     return account

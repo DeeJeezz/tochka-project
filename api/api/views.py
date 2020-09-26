@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from common.models import Account
-from . import serializers
+from common import serializers
 
 
 def error404(request, exception):
