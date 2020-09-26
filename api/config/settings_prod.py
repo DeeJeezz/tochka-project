@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from pathlib import Path
-from celery.schedules import crontab
 
 # if not os.path.exists(os.environ.get('DJANGO_LOG_PATH')):
 #     os.mkdir(os.environ.get('DJANGO_LOG_PATH'))
@@ -33,24 +32,24 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1']
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'file': {
-#             'level': 'INFO',
-#             'class': 'logging.FileHandler',
-#             'filename': f'{os.environ.get("DJANGO_LOG_PATH")}api.log',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': f'{os.environ.get("DJANGO_LOG_PATH")}api.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 # Application definition
 
@@ -153,12 +152,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = False
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
 # Celery settings
@@ -170,11 +171,3 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IMPORTS = ('tasks.tasks',)
-
-CELERY_BEAT_SCHEDULE = {
-    'subtract_balance_every_10_minutes': {
-        'task': 'tasks.tasks.task_subtract_hold_from_balances',
-        'schedule': crontab(minute='*/1')
-    },
-}
-

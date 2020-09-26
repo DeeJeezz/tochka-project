@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from pathlib import Path
-from celery.schedules import crontab
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +27,7 @@ SECRET_KEY = '65r^f)0-3g#kj5g#k8-=mte(6eu(-!ek@_+*9=+jgl(go)@*0u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -91,8 +90,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('SQL_DB_NAME'),
+        'USER': os.environ.get('SQL_DB_USER'),
+        'PASSWORD': os.environ.get('SQL_DB_PASSWORD'),
+        'HOST': os.environ.get('SQL_DB_HOST'),
+        'PORT': os.environ.get('SQL_DB_PORT'),
     }
 }
 
@@ -128,6 +131,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = False
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
@@ -144,11 +149,3 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IMPORTS = ('tasks.tasks',)
-
-CELERY_BEAT_SCHEDULE = {
-    'subtract_balance_every_10_minutes': {
-        'task': 'tasks.tasks.task_subtract_hold_from_balances',
-        'schedule': crontab(minute='*/1')
-    },
-}
-
