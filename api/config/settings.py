@@ -61,7 +61,7 @@ REST_FRAMEWORK = {
         'api.renderer.CustomRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
-    # 'EXCEPTION_HANDLER': 'api.renderer.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'api.renderer.custom_exception_handler'
 }
 
 ROOT_URLCONF = 'config.urls'
