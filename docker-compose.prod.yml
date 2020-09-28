@@ -33,8 +33,8 @@ services:
             - rmq
             - postgres_db
         volumes: 
-            - log_data:/var/log/api
-            - static_volume:/opt/api/staticfiles
+            - log_data:/var/log/tochka-api
+            - static_volume:/opt/tochka-api/staticfiles
         restart: on-failure:3
 
     nginx:
@@ -42,7 +42,7 @@ services:
         ports:
             - 80:80
         volumes:
-            - static_volume:/opt/api/staticfiles
+            - static_volume:/opt/tochka-api/staticfiles
         depends_on:
             - api
         restart: on-failure:3

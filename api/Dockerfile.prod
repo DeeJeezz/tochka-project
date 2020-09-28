@@ -25,6 +25,7 @@ FROM python:3.8-alpine
 
 ENV HOME=/opt/tochka-api
 RUN mkdir -p $HOME
+RUN mkdir /var/log/tochka-api
 
 WORKDIR $HOME
 RUN mkdir $HOME/staticfiles

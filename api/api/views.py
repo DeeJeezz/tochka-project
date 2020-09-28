@@ -21,22 +21,35 @@ def ping(request):
 
 class AccountListViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    asdgdfhrfhrfth
+    Список счетов.
     """
+
     queryset = Account.objects.all()
     serializer_class = serializers.AccountListSerializer
 
 
 class AccountDetailViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Информация о выбранном счете.
+    """
+
     queryset = Account.objects.filter()
     serializer_class = serializers.AccountDetailSerializer
 
 
 class AccountAddBalanceViewSet(viewsets.ModelViewSet):
+    """
+    Пополнение баланса.
+    """
+
     queryset = Account.objects.filter()
     serializer_class = serializers.AccountAddBalanceSerializer
 
 
 class AccountSubtractBalanceViewSet(viewsets.ModelViewSet):
+    """
+    Уменьшение баланса (увеличение холда).
+    """
+
     queryset = Account.objects.filter()
     serializer_class = serializers.AccountSubtractBalanceSerializer

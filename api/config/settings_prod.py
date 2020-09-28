@@ -39,7 +39,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': f'{os.environ.get("DJANGO_LOG_PATH")}api.log',
+            'filename': f'{os.environ.get("DJANGO_LOG_PATH")}/tochka-api.log',
         },
     },
     'loggers': {

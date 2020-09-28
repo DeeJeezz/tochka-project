@@ -18,18 +18,15 @@ services:
     api:
         build: ./api
         command: python /opt/tochka-api/manage.py runserver 0.0.0.0:8000
+        ports: 
+            - 8000:8000
+        volumes: 
+            - ./api:/opt/tochka-api
         env_file:
             - .env
         depends_on: 
             - rmq
             - postgres_db
-
-    nginx:
-        build: ./nginx
-        ports:
-            - 80:80
-        depends_on:
-            - api
 
     celery:
         build: ./api
